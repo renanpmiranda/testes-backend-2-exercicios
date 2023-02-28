@@ -1,3 +1,5 @@
+import { UserModel } from './../types';
+import { DeleteUserInputDTO, DeleteUserOutputDTO, GetUserByIdInputDTO, GetUserByIdOutputDTO } from './../dtos/userDTO';
 import { UserDatabase } from "../database/UserDatabase"
 import { GetAllOutputDTO, LoginInputDTO, LoginOutputDTO, SignupInputDTO, SignupOutputDTO } from "../dtos/userDTO";
 import { BadRequestError } from "../errors/BadRequestError";
@@ -135,6 +137,71 @@ export class UserBusiness {
 
             return user.toBusinessModel()
         })
+
+        return output
+    }
+
+    public deleteUser = async (input: DeleteUserInputDTO): Promise<DeleteUserOutputDTO> => {
+        const { id, token } = input
+
+        if (typeof token !== "string"){
+            throw new BadRequestError("'token' inválido. Deve ser uma string")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if (payload === null){
+            throw new BadRequestError("'token' inválido")
+        }
+
+        const userDB = await this.userDatabase.findById(id)
+
+        if(!userDB) {
+            throw new NotFoundError("User não encontrado")
+        }
+
+        await this.userDatabase.deleteUser(id)
+
+        const output: DeleteUserOutputDTO = {
+            message: "User deletado com sucesso"
+        }
+
+        return output
+    }
+
+    public getUserById = async (input: GetUserByIdInputDTO): Promise<GetUserByIdOutputDTO> => {
+        const { id, token } = input
+
+        if (typeof id !== "string") {
+            throw new BadRequestError("'id' deve ser string")
+        }
+
+        if (typeof token !== "string"){
+            throw new BadRequestError("'token' inválido")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if (payload === null){
+            throw new BadRequestError("'token' inválido")
+        }
+
+        const userDB = await this.userDatabase.findById(id)
+       
+        if(!userDB) {
+            throw new NotFoundError("User não encontrado")
+        }
+
+        const user = new User(
+            userDB.id,
+            userDB.name,
+            userDB.email,
+            userDB.password,
+            userDB.role,
+            userDB.created_at
+        ).toBusinessModel()
+
+        const output: GetUserByIdOutputDTO = user
 
         return output
     }
