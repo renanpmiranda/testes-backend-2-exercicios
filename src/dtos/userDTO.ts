@@ -1,3 +1,4 @@
+import { UserDB } from './../types';
 import { UserModel } from "../types"
 
 export interface SignupInputDTO {
@@ -20,3 +21,19 @@ export interface LoginOutputDTO {
 }
 
 export type GetAllOutputDTO = UserModel[]
+
+export interface DeleteUserInputDTO {
+    id: string,
+    token: string | undefined
+}
+
+export interface DeleteUserOutputDTO {
+    message: string
+}
+
+export interface GetUserByIdInputDTO {
+    id: string,
+    token: string | undefined
+}
+
+export type GetUserByIdOutputDTO = UserModel

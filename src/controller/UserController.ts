@@ -1,3 +1,4 @@
+import { DeleteUserInputDTO, GetUserByIdInputDTO } from './../dtos/userDTO';
 import { Request, Response } from "express"
 import { UserBusiness } from "../business/UserBusiness"
 import { LoginInputDTO, SignupInputDTO, SignupOutputDTO } from "../dtos/userDTO"
@@ -54,6 +55,48 @@ export class UserController {
             const output = await this.userBusiness.getAll()
 
             res.status(200).send(output)
+        } catch (error) {
+            console.log(error)
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).send(error.message)
+            } else {
+                res.status(500).send("Erro inesperado")
+            }
+        }
+    }
+
+    public deleteUser = async (req: Request, res: Response) => {
+        try {
+            const input: DeleteUserInputDTO = {
+                id: req.params.id,
+                token: req.headers.authorization
+            } 
+
+            const output = await this.userBusiness.deleteUser(input)
+
+            res.status(200).send(output)
+
+        } catch (error) {
+            console.log(error)
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).send(error.message)
+            } else {
+                res.status(500).send("Erro inesperado")
+            }
+        }
+    }
+
+    public getUserById = async (req: Request, res: Response) => {
+        try {
+            const input: GetUserByIdInputDTO = {
+                id: req.params.id,
+                token: req.headers.authorization
+            }
+
+            const output = await this.userBusiness.getUserById(input)
+
+            res.status(200).send(output)
+
         } catch (error) {
             console.log(error)
             if (error instanceof BaseError) {
